@@ -6,9 +6,13 @@
 
 > A fully integrated, GPU-accelerated 3D framework coupling high-fidelity SPH simulations with Multi-Agent Soft Actor-Critic (MASAC) reinforcement learning for cooperative control of point absorber wave energy converter arrays.
 
-![Demo](./fig/all.gif)
+![Demo](./fig/3dirre.gif)
 
----
+**Wave energy distribution under 3D irregular wave conditions**
+<p align="center">
+  <img src="./fig/3dirre.png" width="100%">
+</p>
+
 
 <!-- ## 📄 Reference
 
