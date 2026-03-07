@@ -1,0 +1,43 @@
+{
+	// Use IntelliSense to learn about possible attributes.
+	// Hover to view descriptions of existing attributes.
+	// For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "masac",
+			"type": "cppdbg",
+			"request": "launch",
+			"cwd": "${fileDirname}",
+			"miDebuggerPath": "/usr/bin/gdb",
+			"program": "/home/yi/data/paper6/masac_pto/bin/linux/FlexStruc/DualSPHysics5.2_FlexStruc_linux64",
+			"args": ["-gpu:0",
+             "/home/yi/data/paper6/masac_pto/examples/singleplate0/CasePistonDamping_REG_out/CasePistonDamping_REG",
+			 "/home/yi/data/paper6/masac_pto/examples/singleplate0/CasePistonDamping_REG_out",
+            //  "/home/yi/data/paper6/masac_pto/examples/multi_pto/CaseFloatingWavesVal2_out/CaseFloatingWavesVal2",
+			//  "/home/yi/data/paper6/masac_pto/examples/multi_pto/CaseFloatingWavesVal2_out",
+			 "-dirdataout",
+			 "data",
+		  	 "-svres"],
+		}
+	],
+	// "setupCommands": [
+  	// {
+    // "description": "Enable pretty-printing for gdb",
+    // "text": "-enable-pretty-printing",
+    // "ignoreFailures": true
+  	// }
+	// ],
+	// "setupCommands": [
+	// 	{
+	// 		"description": "Manually load libstdc++ pretty printers",
+	// 		"text": "python import sys;sys.path.insert(0, '/usr/share/gcc/python');from libstdcxx.v6.printers import register_libstdcxx_printers;register_libstdcxx_printers(None)",
+	// 		"ignoreFailures": false
+	// 	},
+	// 	{
+	// 		"description": "Enable pretty-printing for gdb",
+	// 		"text": "-enable-pretty-printing",
+	// 		"ignoreFailures": true
+	// 	}
+	// ]
+}
