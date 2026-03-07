@@ -47,6 +47,11 @@ This project presents an **SPH–MADRL** coupled framework that:
 ---
 
 ## 🏗️ Architecture
+The two-way coupling between the SPH solver and DRL consists of three main steps:
+
+1. **Observation**: Flow field information computed by the SPH solver (velocities, pressures and free-surface elevations) is transferred to the DRL neural networks as local observations.
+2. **Action**: Each agent generates new actions according to its neural network output, while network updates are performed conditionally depending on the filling ratio of the replay buffer.
+3. **Control**: These actions are fed back into the SPH solver to actively control the structure and regulate the ongoing simulation.
 
 ![Architecture](./fig/sph_drl.svg)
 
