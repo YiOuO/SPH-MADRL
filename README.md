@@ -44,7 +44,7 @@ This project presents an **SPH–MADRL** coupled framework that:
 
 ## 🏗️ Architecture
 
-![Architecture](./fig/sph_drl.pdf)
+![Architecture](./fig/sph_drl.svg)
 
 ### Agent Observation Space (per device)
 
