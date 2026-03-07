@@ -1,6 +1,6 @@
 # SPH-MADRL: Coupled Smoothed Particle Hydrodynamics with Multi-Agent Deep Reinforcement Learning for Wave Energy Converters
 
-<!-- [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) -->
+[![License: LGPL v3](https://img.shields.io/badge/License-LGPL_v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
 [![GPU Accelerated](https://img.shields.io/badge/GPU-CUDA%20Accelerated-green)](https://developer.nvidia.com/cuda-toolkit)
 [![Platform](https://img.shields.io/badge/Platform-Linux-blue)](https://www.linux.org/)
 
@@ -107,7 +107,7 @@ k_{p,i} = k_base + o_i × Δk_max,   Δk_max = 0.9 × k_base
 - **Wave generation**: Piston-type wave maker (regular & irregular via JONSWAP spectrum)
 - **Boundary conditions**: Multi-layer dummy particles (Adami et al., 2012)
 - **Stability**: CFL condition with `C_CFL = 0.2`
-- **Enhancements**: VEM + HPDC divergence cleaning schemes
+- **Enhancements**: Divergence cleaning schemes
 
 ### MASAC Hyperparameters
 
@@ -142,7 +142,7 @@ SPH computations dominate runtime (~82–88%); DRL overhead is minimal with the 
 
 | Component | Version / Details |
 |-----------|------------------|
-| SPH Solver | DualSPHysics+ (extended DualSPHysics) |
+| SPH Solver | DualSPHysics (V5.2) |
 | DRL Library | LibTorch (PyTorch C++ API) 2.8.0 |
 | CUDA | 12.8 |
 | Compiler | g++ 11.4, nvcc 12.8.93 |
