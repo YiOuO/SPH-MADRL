@@ -37,9 +37,9 @@ MultiAgents::selectActionsWithNoise(const std::vector<std::vector<float>> &input
                            .clone()
                            .to(my_device);
 
-        // 假设每个体都有自己的 actor[i]，且 sample 返回 (action, log_prob)
+        // Each agent samples its own action and log probability.
         auto [a_i, logp_i] = actors[i]->sample(state_i);     // (1, act_dim_i) on device
-        actions.push_back(a_i.to(torch::kCPU).contiguous()); // 方便上层读取指针/转 std::vector
+        actions.push_back(a_i.to(torch::kCPU).contiguous()); // Keep the tensor contiguous for conversion to std::vector.
     }
     std::cout << "actions with noises: ";
     for (const auto& a : actions)
@@ -47,7 +47,7 @@ MultiAgents::selectActionsWithNoise(const std::vector<std::vector<float>> &input
         std::cout << a[0].item().toFloat() << " ";
     }
     std::cout << std::endl;
-    return actions; // N 个 (1, act_dim_i)
+    return actions; // One (1, act_dim_i) tensor per agent.
 }
 
 
@@ -97,7 +97,7 @@ std::vector<torch::Tensor> MultiAgents::selectRandomActions()
 
     for (int i = 0; i < num_agents; ++i)
     {
-        // 均匀噪声 [-1, 1], 形状 (1, act_dim_i)
+        // Sample uniform actions in [-1, 1] with shape (1, act_dim_i).
         auto a_i = torch::rand({1, local_act_dim[i]}, opts).mul_(2.0).sub_(1.0);
         actions.push_back(a_i.to(torch::kCPU).contiguous());
     }
@@ -107,106 +107,9 @@ std::vector<torch::Tensor> MultiAgents::selectRandomActions()
         std::cout << a[0].item().toFloat() << " ";
     }
     std::cout << std::endl;
-    return actions; // N 个 (1, act_dim_i)
+    return actions; // One (1, act_dim_i) tensor per agent.
 }
 
-// void MultiAgents::update(const torch::Tensor &state_batch_,
-//                          const torch::Tensor &action_batch_,
-//                          const torch::Tensor &next_state_batch_,
-//                          const torch::Tensor &done_batch_,
-//                          const torch::Tensor &reward_batch_)
-// {
-//     // --- device unify ---
-//     auto state_batch      = state_batch_.to(my_device);
-//     auto action_batch     = action_batch_.to(my_device);
-//     auto next_state_batch = next_state_batch_.to(my_device);
-//     auto done_batch       = done_batch_.to(my_device);
-//     auto reward_batch     = reward_batch_.to(my_device);
-
-//     // --- next actions/logprobs (detach both) ---
-//     std::vector<torch::Tensor> nextActionParts(num_agents), nextLogProbParts(num_agents);
-//     for (int i = 0; i < num_agents; ++i)
-//     {
-//         auto next_local_obs_i = sliceLocalObservation(next_state_batch, i);
-//         auto [next_act_i, next_logprob_i] = actors[i]->sample(next_local_obs_i);
-//         nextActionParts[i]  = next_act_i.detach();
-//         nextLogProbParts[i] = next_logprob_i.detach();
-//     }
-//     auto next_action_batch = concatAlongFeature(nextActionParts); // [B, sumA]
-
-//     // --- global entropy: sum_j alpha_j * logpi_j ---
-//     auto weighted_sum_next_logprob = torch::zeros_like(nextLogProbParts[0]); // [B,1]
-//     for (int j = 0; j < num_agents; ++j)
-//         weighted_sum_next_logprob = weighted_sum_next_logprob + nextLogProbParts[j] * temperatures[j];
-
-//     // --- critics update ---
-//     for (int i = 0; i < num_agents; ++i)
-//     {
-//         torch::Tensor targetQ_i;
-//         {
-//             torch::NoGradGuard noGrad;
-//             auto q1Next = target_critics1[i]->forward(next_state_batch, next_action_batch);
-//             auto q2Next = target_critics2[i]->forward(next_state_batch, next_action_batch);
-//             auto minQNext = torch::min(q1Next, q2Next);
-
-//             auto reward_i = reward_batch.index({torch::indexing::Slice(), i}).view({-1,1});
-//             auto done_i   =   done_batch.index({torch::indexing::Slice(), i}).view({-1,1});
-
-//             targetQ_i = reward_i + gamma * (1.0 - done_i) * (minQNext - weighted_sum_next_logprob);
-//         }
-
-//         auto q1 = critics1[i]->forward(state_batch, action_batch);
-//         auto q2 = critics2[i]->forward(state_batch, action_batch);
-//         auto criticLoss = torch::mse_loss(q1, targetQ_i) + torch::mse_loss(q2, targetQ_i);
-
-//         critic1_optimizers[i]->zero_grad();
-//         critic2_optimizers[i]->zero_grad();
-//         criticLoss.backward();
-//         critic1_optimizers[i]->step();
-//         critic2_optimizers[i]->step();
-//     }
-
-//     // --- actor + alpha update ---
-//     std::vector<torch::Tensor> currentActionParts(num_agents), currentLogProbParts(num_agents);
-//     for (int i = 0; i < num_agents; ++i)
-//     {
-//         auto local_obs_i = sliceLocalObservation(state_batch, i);
-//         auto [act_i, logprob_i] = actors[i]->sample(local_obs_i);
-//         currentActionParts[i] = act_i;
-//         currentLogProbParts[i] = logprob_i;
-//     }
-
-//     for (int i = 0; i < num_agents; ++i)
-//     {
-//         std::vector<torch::Tensor> jointActionParts(num_agents);
-//         for (int j = 0; j < num_agents; ++j)
-//             jointActionParts[j] = (j == i) ? currentActionParts[j] : currentActionParts[j].detach();
-
-//         auto jointAction = concatAlongFeature(jointActionParts);
-//         auto qMin_i = torch::min(
-//             critics1[i]->forward(state_batch, jointAction),
-//             critics2[i]->forward(state_batch, jointAction));
-//         auto actorLoss_i = (temperatures[i] * currentLogProbParts[i] - qMin_i).mean();
-
-//         actor_optimizers[i].zero_grad();
-//         actorLoss_i.backward();
-//         actor_optimizers[i].step();
-
-//         // - Auto temperature tuning
-//         auto alphaLoss_i = -(log_alphas[i] * (currentLogProbParts[i].detach() + target_entropy)).mean();
-//         alpha_optimizers[i].zero_grad();
-//         alphaLoss_i.backward();
-//         alpha_optimizers[i].step();
-//         temperatures[i] = log_alphas[i].exp().item<double>();
-//     }
-
-//     // --- soft update ---
-//     torch::NoGradGuard noGrad;
-//     for (int i = 0; i < num_agents; ++i) {
-//         soft_update(critics1[i], target_critics1[i]);
-//         soft_update(critics2[i], target_critics2[i]);
-//     }
-// }
 
 
 void MultiAgents::update(const torch::Tensor &state_batch_,
@@ -240,7 +143,7 @@ void MultiAgents::update(const torch::Tensor &state_batch_,
         weighted_sum_next_logprob = weighted_sum_next_logprob + nextLogProbParts[j] * temperatures[j];
 
     // --- critics update ---
-    std::vector<double> critic_loss_log(num_agents);  // ← 新增
+    std::vector<double> critic_loss_log(num_agents);  // Per-agent critic loss for logging.
     for (int i = 0; i < num_agents; ++i)
     {
         torch::Tensor targetQ_i;
@@ -266,11 +169,11 @@ void MultiAgents::update(const torch::Tensor &state_batch_,
         critic1_optimizers[i]->step();
         critic2_optimizers[i]->step();
 
-        critic_loss_log[i] = criticLoss.item<double>();  // ← 新增
+        critic_loss_log[i] = criticLoss.item<double>();  // Record this agent's critic loss.
     }
 
     // --- actor + alpha update ---
-    std::vector<double> actor_loss_log(num_agents);  // ← 新增
+    std::vector<double> actor_loss_log(num_agents);  // Per-agent actor loss for logging.
 
     std::vector<torch::Tensor> currentActionParts(num_agents), currentLogProbParts(num_agents);
     for (int i = 0; i < num_agents; ++i)
@@ -296,7 +199,7 @@ void MultiAgents::update(const torch::Tensor &state_batch_,
         actor_optimizers[i].zero_grad();
         actorLoss_i.backward();
         actor_optimizers[i].step();
-        actor_loss_log[i] = actorLoss_i.item<double>();  // ← 新增
+        actor_loss_log[i] = actorLoss_i.item<double>();  // Record this agent's actor loss.
 
         auto alphaLoss_i = -(log_alphas[i] * (currentLogProbParts[i].detach() + target_entropy)).mean();
         alpha_optimizers[i].zero_grad();

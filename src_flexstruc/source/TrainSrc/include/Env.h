@@ -13,28 +13,28 @@ public:
 
     /*
     -----------------------------------
-    功能：在仿真环境中执行一步操作
-    @param state        当前波浪状态
-    @param action       当前执行的动作
-    @param reward       返回当前动作的奖励值
-    @param next_state   返回执行该动作后的波浪状态
+    Execute one simulation step.
+    @param state        Current wave state.
+    @param action       Action to execute.
+    @param reward       Reward for the action.
+    @param next_state   Wave state after the action.
     -----------------------------------
     */
     void step();
 
     /*
     -----------------------------------
-    功能：计算奖励值
-    @param state        待评价的波浪状态
+    Compute the reward for a wave state.
+    @param state        Wave state to evaluate.
 
-    @return             奖励值
+    @return             Computed reward.
     -----------------------------------
     */
     double calReward();
 
     /*
     -----------------------------------
-    功能：重置环境
+    Reset the environment.
     -----------------------------------
     */
     void reset();

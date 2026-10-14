@@ -75,7 +75,6 @@ MyAgent::MyAgent(   int state_dim_,
      * Performs one training step using a mini-batch from the replay buffer.
      * If there are not enough samples, the function returns without doing anything.
      */
-    // void train_step(ReplayBuffer& buffer, size_t batch_size)
 
     void MyAgent::update(   const torch::Tensor& state_batch_, 
                             const torch::Tensor& action_batch_, 
@@ -118,7 +117,6 @@ MyAgent::MyAgent(   int state_dim_,
         actor_opt.step();
 
         //---------- Alpha update ----------
-        // auto alpha_loss = -(log_alpha.exp() * (logp_pred + target_entropy).detach()).mean();
         auto detached_logp = logp_pred.detach();
         auto alpha_loss = -(log_alpha * (detached_logp + target_entropy)).mean();
         alpha_opt.zero_grad();
@@ -127,13 +125,8 @@ MyAgent::MyAgent(   int state_dim_,
         alpha = log_alpha.exp().item<double>();  // update scalar        
 
         //---------- Soft update target networks ----------
-        // torch::NoGradGuard no_grad;
         soft_update(critic1, target1);
         soft_update(critic2, target2);
-        // std::cout << "actor_loss: " << actor_loss.item<double>()
-        //   << ", critic_loss: " << critic_loss.item<double>()
-        //   << ", avg_q: " << q_pred.mean().item<double>()
-        //   << ", logp: " << logp_pred.mean().item<double>() << std::endl;
     }
 
     // Optionally: save/load model weights

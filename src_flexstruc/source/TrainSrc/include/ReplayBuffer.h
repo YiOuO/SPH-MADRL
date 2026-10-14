@@ -28,7 +28,7 @@ public:
 
     /*
     -----------------------------------
-    功能：存储经验
+    Store one transition in the replay buffer.
     @param state         
     @param action         
     @param next_state         
@@ -44,7 +44,7 @@ public:
 
     /*
     -----------------------------------
-    功能：从经验池中读取batch_num个经验用于训练
+    Sample batch_num transitions from the replay buffer for training.
     @param state_batch         
     @param action_batch         
     @param next_state_batch         
@@ -62,8 +62,8 @@ public:
     
     /*
     -----------------------------------
-    功能：获取当前经验池的大小
-    @return         当前经验池的大小          
+    Return the current number of stored transitions.
+    @return         Number of stored transitions.
     -----------------------------------
     */
     int getBufferDataNum();

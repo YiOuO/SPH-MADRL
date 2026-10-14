@@ -102,7 +102,7 @@ template<TpKernel tker,TpFtMode ftmode,bool lamsps,TpDensity tdensity,bool shift
         double wec1_drzfb = pscellf1.z - pscellb1.z + CTE.poscellsize * (PSCEL_GetfZ(pscellf1.w) - PSCEL_GetfZ(pscellb1.w));
 
         double rp1p2fb = sqrtf(wec1_drxfb*wec1_drxfb + wec1_dryfb*wec1_dryfb + wec1_drzfb*wec1_drzfb);
-        double eps = 1e-6f; // 避免除零
+        double eps = 1e-6f; // Avoid division by zero.
         double inv_rp1p2fb = (rp1p2fb > eps) ? (1.0f / rp1p2fb) : 0.0f;
         double fallfb = wec1_kspring * (rp1p2fb - wec1_lspring);
 
@@ -116,7 +116,7 @@ template<TpKernel tker,TpFtMode ftmode,bool lamsps,TpDensity tdensity,bool shift
         double wec2_drzfb = pscellf2.z - pscellb2.z + CTE.poscellsize * (PSCEL_GetfZ(pscellf2.w) - PSCEL_GetfZ(pscellb2.w));
 
         rp1p2fb = sqrtf(wec2_drxfb*wec2_drxfb + wec2_dryfb*wec2_dryfb + wec2_drzfb*wec2_drzfb);
-        eps = 1e-6f; // 避免除零
+        eps = 1e-6f; // Avoid division by zero.
         inv_rp1p2fb = (rp1p2fb > eps) ? (1.0f / rp1p2fb) : 0.0f;
         fallfb = wec2_kspring * (rp1p2fb - wec2_lspring);
 

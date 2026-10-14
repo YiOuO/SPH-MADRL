@@ -217,10 +217,4 @@ public:
     }
 };
 
-// inline void MultiAgents::setNetMode(bool trainOrEval)
-// {
-//     // if true, then train mode; if false, then eval mode
-//     trainOrEval ? actor->train() : actor->eval();
-// }
-
 #endif
